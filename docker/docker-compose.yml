@@ -1,0 +1,44 @@
+version: '3.7'
+
+networks:
+    goapp-network:
+        name: goapp-network
+
+volumes:
+    goapp_postgresql_data:
+        name: goapp_postgresql_data
+
+services:
+
+    golang:
+        container_name: goapp-golang
+        image: golang:1.16.6-buster
+        working_dir: /go/src/app
+        volumes:
+            - ./../go-app:/go/src/app
+        networks:
+            - goapp-network
+            
+    postgres:
+        container_name: goapp-postgres
+        build: ./postgres/
+        image: postgres:goapp
+        environment:
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - PROJECT_DB_NAME=${PROJECT_DB_NAME}
+            - PROJECT_USER_NAME=${PROJECT_USER_NAME}
+            - PROJECT_USER_PASSWORD=${PROJECT_USER_PASSWORD}
+        ports:
+            - ${POSTGRES_EXTERNAL_PORT}:5432
+        volumes:
+            - goapp_postgresql_data:/var/lib/postgresql/data
+        networks:
+            - goapp-network
+
+    adminer:
+        container_name: goapp-adminer
+        image: adminer:4.8.1-standalone
+        ports:
+            - ${ADMINER_EXTERNAL_PORT}:8080
+        networks:
+            - goapp-network
