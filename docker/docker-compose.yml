@@ -18,7 +18,7 @@ services:
             - ./../go-app:/go/src/app
         networks:
             - goapp-network
-            
+
     postgres:
         container_name: goapp-postgres
         build: ./postgres/
